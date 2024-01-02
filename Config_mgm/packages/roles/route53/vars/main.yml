@@ -1,0 +1,10 @@
+---
+# vars file for route53
+zone: "{{ zone }}" # "kafka.com" #"streams.com"
+recordPrifix: "{{ recordPrifix }}" # "kf"
+#zone:  "kafka.com" #"streams.com"
+#record: "zk1.kafka.com"
+recordPrifix: "kf"
+type: "A"
+ttl: "300"
+value: "172.31.26.1"

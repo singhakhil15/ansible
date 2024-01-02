@@ -1,0 +1,6 @@
+- name: httpd services start
+  hosts: kafkaConnect
+  become: true
+  become_user: root
+  roles:
+    - kafkaConnect

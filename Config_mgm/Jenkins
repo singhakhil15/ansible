@@ -1,0 +1,31 @@
+pipeline {
+  agent { label 'Slave-001'}
+  options { disableConcurrentBuilds() }
+  stages {
+    
+    stage ('Version Stage') {
+      steps {
+        sh "git --version"
+        sh "node -v"
+      }
+    }
+        
+    stage ('Build Stage') {
+      steps {
+        echo "Build"
+      }
+    }
+    
+    stage ('Testing Stage') {
+      steps {
+        echo "Testing"
+      }
+    }
+    
+    stage ('Deployment Stage') {
+      steps {
+        echo "Deployment"
+      }
+    }
+  }
+} 

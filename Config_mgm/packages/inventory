@@ -1,0 +1,14 @@
+[zookeeper]
+zookeeper1 ansible_host=zk1.streams.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem
+zookeeper2 ansible_host=zk2.streams.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem 
+zookeeper3 ansible_host=zk3.streams.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem
+
+[kafka]
+kafka1 ansible_host=kf1.kafka.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem
+kafka2 ansible_host=kf2.kafka.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem 
+kafka3 ansible_host=kf3.kafka.com ansible_user=ubuntu ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/Kafka-Zookeeper.pem
+
+[kafkaConnect]
+webserver1 ansible_host=18.191.13.59 ansible_user=ec2-user ansible_ssh_private_key_file=/home/ec2-user/AnsiblePlaybooks/keys/axcessio-dev-key.pem  broker_id=1 server_name="PLAINTEXT://172.31.36.31:9092" listener="PLAINTEXT://18.191.13.59:9092"
+ 
+ 

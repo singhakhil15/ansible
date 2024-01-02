@@ -1,0 +1,9 @@
+- name: start zookeeper server
+  hosts: zookeeper
+  become: true
+  become_user: root
+  tasks:
+    - name: "Start zookeeper"
+      service:
+        name: zookeeper
+        state: started

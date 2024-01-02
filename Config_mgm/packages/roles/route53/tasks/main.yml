@@ -1,0 +1,31 @@
+---
+# tasks file for route53
+
+- name: "Creating Record Set" 
+  route53:
+    state: present
+    zone: "{{ zone }}"
+    record: "{{ recordPrifix }}{{ item.0 + 1 }}.{{ zone }}"
+    type: "{{ type }}"
+    ttl: "{{ ttl }}"
+    value: "{{ item.1 }}"
+    wait: yes
+    private_zone: True
+    overwrite: True
+  with_indexed_items:
+    - "{{ groups['webservers'] }}"
+  register: webserversDomain 
+  
+ 
+- name: "webserver domain vars "
+  debug:
+    msg: "{{ item.invocation.module_args.record }}"
+  with_items: "{{ webserversDomain.results }}"
+  #loop: "{{lookup('subelements', webserversDomain.results, 'invocation' )}}" 
+   
+- name: Add the newly created host so that we can further contact it
+  add_host:
+    name: "{{ item.invocation.module_args.record }}"
+    groups: domaingroup
+  with_items: "{{ webserversDomain.results }}"
+#  loop: "{{lookup('subelements', ec2.results, 'instances' )}}" 

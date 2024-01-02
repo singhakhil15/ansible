@@ -1,0 +1,109 @@
+---
+# tasks file for zookeeper
+
+- name: "Move the extracted file to kafka folder" 
+  command: mv  /home/ubuntu/kafka_2.11-2.3.0 /home/ubuntu/kafka
+
+- name: "Copy zookeeper script file"
+  become: true
+  become_user: root
+  copy:
+    src: zookeeper
+    dest: /etc/init.d/
+    owner: root
+    group: root
+
+- name: "Make zookeeper script file as executable" 
+  become: true
+  become_user: root
+  command: chmod +x /etc/init.d/zookeeper
+  
+- name: "Make zookeeper script file as owner and group as root" 
+  become: true
+  become_user: root
+  command: chown root:root /etc/init.d/zookeeper
+  
+- name: "update the services" 
+  become: true
+  become_user: root
+  command: update-rc.d zookeeper defaults
+
+- name: "To avoide warning" 
+  become: true
+  become_user: root
+  command: systemctl daemon-reload
+
+- name: "Remove zookeeper.properties file"
+  file:
+    path: /home/ubuntu/kafka/config/zookeeper.properties
+    state: absent
+
+- name: "Add zookeeper.properties file"
+  copy:
+    src: zookeeper.properties
+    dest: /home/ubuntu/kafka/config/
+    
+#######################################################################################
+- name: "Defining hosts in zookeeper.properties"
+  #debug:
+  #  msg: "{{ item.0 }} value {{ item.1 }}  "
+  lineinfile:
+    path=/home/ubuntu/kafka/config/zookeeper.properties
+    line="server.{{ item.0 + 1 }}={{ item.1 }}:2888:3888"
+  with_indexed_items:
+    - "{{ groups['domaingroup'] }}"
+
+
+#- name: "Defining zookeeper variables"
+#  debug:
+#     var: "{{ inventory_hostname }}"
+#  register: zookeeperVars  
+
+#- name: "Printing out zookeeperVars"
+#  debug:
+#    msg: "{{ zookeeperVars }}"
+  
+
+#######################################################################################
+        
+- name: "Create data dictionary"
+  file:
+    path: /data
+    state: directory
+    mode: 0755
+
+- name: "Create zookeeper dictionary"
+  file:
+    path: /data/zookeeper
+    state: directory
+    mode: 0755
+
+- name: "Change owner of /data directory"
+  become: true
+  become_user: root
+  command: chown -R ubuntu:ubuntu /data
+  args:
+    warn: false
+
+- name: "Create myid file in /data/zookeeper/"
+  file:
+    path: /data/zookeeper/myid
+    state: touch
+    mode: 0755
+    owner: ubuntu
+    group: ubuntu
+  
+- name: "Declear the server's identity for server"
+  lineinfile:
+    path: /data/zookeeper/myid
+    line: "{{groups['domaingroup'].index(inventory_hostname) + 1 }}"
+
+#- name: "Change owner of /data directory"
+#  become: true
+#  become_user: root
+#  command: echo "{{groups['webserversDomain'].index(inventory_hostname) + 1 }}" 
+#  args:
+#    warn: false
+   
+#- local_action: lineinfile line="  - {{ inventory_hostname  }}" path=/home/ec2-user/packages/roles/kafka/vars/main.yml    
+    

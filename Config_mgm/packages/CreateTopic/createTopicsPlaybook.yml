@@ -1,0 +1,7 @@
+- name: httpd services start
+  hosts: kafka1
+  become: true
+  become_user: root
+  tasks:
+    - name: "Create topic in kafka"
+      command: /home/ubuntu/kafka/bin/kafka-topics.sh --create --zookeeper zk1.streams.com:2181,zk2.streams.com:2181,zk3.streams.com:2181/kafka --replication-factor 3 --partitions 8 --topic sugarcrmlog

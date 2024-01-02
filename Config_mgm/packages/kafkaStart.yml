@@ -1,0 +1,9 @@
+- name: start kafka server
+  hosts: kafka
+  become: true
+  become_user: root
+  tasks:
+    - name: "Start kafka"
+      service:
+        name: kafka
+        state: started

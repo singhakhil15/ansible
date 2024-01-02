@@ -1,0 +1,67 @@
+---
+# tasks file for kafkaSink
+
+- name: "Move the extracted file to kafka folder" 
+  command: mv  /home/ubuntu/kafka_2.11-2.3.0 /home/ubuntu/kafka
+
+- name: "copy source.properties"
+  copy: src=file-sink.properties dest=/home/ubuntu/kafka/config/ owner=ubuntu group=ubuntu mode=0777
+
+- name: "copy standalone.properties"
+  copy: src=file-standalone.properties dest=/home/ubuntu/kafka/config/ owner=ubuntu group=ubuntu mode=0777
+
+- name: "configure listener address"
+  lineinfile:
+    path: /home/ubuntu/kafka/config/server.properties
+    line: "listeners=PLAINTEXT://{{inventory_hostname}}:9092"
+
+- name: "configure advertised.listeners address"
+  lineinfile:
+    path: /home/ubuntu/kafka/config/server.properties
+    line: "advertised.listeners=PLAINTEXT://{{inventory_hostname}}:9092"    
+   
+- name: "copy kafka_start"
+  copy: src=kafka_start.sh dest=/home/ubuntu/kafkaStart/ owner=ubuntu group=ubuntu mode=0777
+
+- name: "change the file permission"
+  command: sudo chmod 0777 -R /home/ubuntu/kafkaStart
+
+# copy the script file
+- name: "Copy kafka script file"
+  become: true
+  become_user: root
+  copy: 
+    src=sinkS3Batch.sh 
+    dest=/home/ubuntu/ 
+    owner=root 
+    group=root
+
+# make script file executable chmod +x filename
+- name: "Make kafka script file as executable" 
+  command: sudo chmod +x /home/ubuntu/sinkS3Batch.sh
+
+# create folder to strore streaming data 
+- name: "Create data dictionary"
+  file:
+    path: /home/ubuntu/sinkData
+    state: directory
+    mode: 0755
+    
+# create file in which data will get stored
+- name: "Create myid file in /data/zookeeper/"
+  file:
+    path: /home/ubuntu/sinkData/myDataFile
+    state: touch
+    mode: 0755
+    owner: ubuntu
+    group: ubuntu
+
+# update cron tab  */2 * * * * /home/ubuntu/sinkS3Batch.sh
+- name: Ensure a job that runs at every 2 minutes
+  cron:
+    name: "check dirs"
+    minute: "*/2"
+    job: "/home/ubuntu/sinkS3Batch.sh" 
+
+- name: "run kafka"    
+  command: sudo /home/ubuntu/kafkaStart/kafka_start.sh    

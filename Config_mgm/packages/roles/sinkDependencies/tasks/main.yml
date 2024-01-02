@@ -1,0 +1,24 @@
+---
+# tasks file for sinkDependencies
+- name: "Update the server"
+  become: true
+  become_user: root
+  command: apt-get update -y
+  args:
+    warn: false
+    
+- name: Install a list of packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+        
+- name: "Swapping configuration may not changes after reboot"
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: "vm.swappiness=1"
+    
+- name: Unarchive a kafka-zookeeper file that needs to be downloaded
+  unarchive:
+    src: "{{ kafkaZookeeperFile }}"
+    dest: /home/ubuntu/
+    remote_src: yes

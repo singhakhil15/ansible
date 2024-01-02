@@ -1,0 +1,18 @@
+- name: Sink worker create ec2-instances
+  hosts: localhost
+  become: true
+  become_user: root
+  roles:
+    - role: singleEC2
+      instanceName: KafkaWorkerSink  
+
+- name: SSH to servers
+  hosts: webservers 
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  roles:
+    - sinkDependencies
+    - awsCLI
+    - kafkaSink
+

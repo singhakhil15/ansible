@@ -1,0 +1,83 @@
+- name: "update the server"
+  command: yum update -y
+  
+- name: "install wget"
+  command: yum install wget -y
+
+- name: "Download Kafka and Zookeeper"
+  command: wget http://mirrors.estointernet.in/apache/kafka/2.3.0/kafka_2.11-2.3.0.tgz
+
+- name: "Extract file"
+  command: tar -xvzf kafka_2.11-2.3.0.tgz
+      
+- name: "Move the extracted file to kafka folder" 
+  command: mv  /home/ec2-user/kafka_2.11-2.3.0 /home/ec2-user/kafka
+
+- name: "Remove tgz file" 
+  command: rm -rf kafka_2.11-2.3.0.tgz
+  
+- name: "Uninstall java7"
+  command: sudo yum remove java-1.7.0-openjdk -y
+  
+- name: "Install java8"
+  command: sudo yum install java-1.8.0 -y
+
+- name: "change the file permission"
+  command: sudo chmod 0777 -R /home/ec2-user/.bashrc
+  
+- name: "add JAVA_HOME to .bashrc"
+  lineinfile:
+    path: /home/ec2-user/.bashrc
+    line: "export JAVA_HOME=-/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-1.el8_0.x86_64"
+    
+- name: "add JAVA_HOME to .bashrc"
+  lineinfile:
+    path: /home/ec2-user/.bashrc
+    line: "export PATH=$PATH:$JAVA_HOME"
+    
+- name: "making kafka folder as writable"
+  command: sudo chmod 0777 -R /home/ec2-user/kafka
+
+- name: "copy source.properties"
+  copy: src=sugarcrm-source.properties dest=/home/ec2-user/kafka/config/ owner=ec2-user group=ec2-user mode=0777
+
+- name: "copy standalone.properties"
+  copy: src=sugarcrm-standalone.properties dest=/home/ec2-user/kafka/config/ owner=ec2-user group=ec2-user mode=0777
+
+- name: "change the file permission"
+  command: sudo chmod 0777 -R /home/ec2-user/kafka
+
+- name: "configure listener address"
+  lineinfile:
+    path: /home/ec2-user/kafka/config/server.properties
+    line: "listeners={{server_name}}"
+
+- name: "configure advertised.listeners address"
+  lineinfile:
+    path: /home/ec2-user/kafka/config/server.properties
+    line: "advertised.listeners={{listener}}"    
+
+#- name: Add IP address of all hosts to all hosts
+#  become: true
+#  become_user: root
+#  lineinfile:
+#    dest: /etc/hosts
+#    line: "{{ item.ipadd }} {{ item.name }}"
+#    state: present
+#  with_items:
+#    - { name: 'kafka1', ipadd: '172.31.5.188 ' }
+#    - { name: 'kafka2', ipadd: '172.31.20.115' }
+#    - { name: 'kafka3', ipadd: '172.31.42.71' }
+#    - { name: 'zookeeper1', ipadd: '172.31.13.160' }
+#    - { name: 'zookeeper2', ipadd: '172.31.19.26' }
+#    - { name: 'zookeeper3', ipadd: '172.31.42.57' }
+    
+- name: "copy kafka_start"
+  copy: src=kafka_start.sh dest=/home/ec2-user/kafkaStart/ owner=ec2-user group=ec2-user mode=0777
+
+- name: "change the file permission"
+  command: sudo chmod 0777 -R /home/ec2-user/kafkaStart
+
+- name: "run kafka"    
+  command: sudo /home/ec2-user/kafkaStart/kafka_start.sh  
+  

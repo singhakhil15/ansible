@@ -1,0 +1,22 @@
+- hosts: localhost
+  become: true
+  roles:
+    - role: ec2 
+      instanceName: kafka 
+
+- name: Execution of route53  
+  hosts: localhost
+  become: true
+  roles:
+    - role: route53
+      zone: "kafka.com"
+      recordPrifix: "kf"  #tasks:
+  
+- name: SSH to servers
+  hosts: domaingroup 
+  remote_user: ubuntu
+  become: yes
+  gather_facts: no
+  roles:
+    - dependencies
+    - kafka

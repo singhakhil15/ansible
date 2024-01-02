@@ -1,0 +1,89 @@
+#- name: Unarchive a file that needs to be downloaded (added in 2.0)
+#  unarchive:
+#    src: http://mirrors.estointernet.in/apache/kafka/2.3.0/kafka_2.11-2.3.0.tgz
+#    dest: /home/ubuntu/
+#    remote_src: yes
+
+- name: "Move the extracted file to kafka folder" 
+  command: mv  /home/ubuntu/kafka_2.11-2.3.0 /home/ubuntu/kafka
+
+- name: "Add file limits configs -allow to open 100,000 files"
+  become: true
+  become_user: root
+  lineinfile:
+    dest: /etc/security/limits.conf
+    line: "{{ item }}"
+    state: present
+  with_items: 
+    - { '* hard nofile 100000' }  
+    - { '* soft nofile 100000' }
+
+- name: "Copy kafka script file"
+  become: true
+  become_user: root
+  copy: 
+    src=kafka 
+    dest=/etc/init.d/ 
+    owner=root 
+    group=root
+
+- name: "Make kafka script file as executable" 
+  command: sudo chmod +x /etc/init.d/kafka
+  
+- name: "Make kafka script file as owner and group as root"
+  become: true
+  become_user: root    
+  command: chown root:root /etc/init.d/kafka
+  
+- name: "update the services"
+  become: true
+  become_user: root    
+  command: update-rc.d kafka defaults
+
+- name: "To avoide warning"
+  become: true
+  become_user: root    
+  command: systemctl daemon-reload
+
+- name: "Remove server.properties file"
+  file:
+    path: /home/ubuntu/kafka/config/server.properties
+    state: absent
+
+- name: "Add server.properties file"
+  become: true
+  become_user: root
+  copy: 
+    src: server.properties 
+    dest: /home/ubuntu/kafka/config/
+    
+- name: "Update broker id in server.properties"
+  become: true
+  become_user: root
+  command: sed -i "s/broker.id=.*/broker.id={{groups['domaingroup'].index(inventory_hostname) + 1 }}/" /home/ubuntu/kafka/config/server.properties
+
+- name: "Update advertised.listeners value in server.properties"
+  become: true
+  become_user: root
+  command: sed -i "/ADVERTIED_LISTNER.*/c\advertised.listeners=PLAINTEXT:\/\/{{inventory_hostname}}:9092" /home/ubuntu/kafka/config/server.properties
+  
+
+- name: "Create data dictionary"
+  file:
+    path: /data
+    state: directory
+    mode: 0755
+
+- name: "Create kafka dictionary"
+  file:
+    path: /data/kafka
+    state: directory
+    mode: 0755
+
+- name: "Start kafka server"
+  become: true
+  become_user: root
+  command: sudo chown -R ubuntu:ubuntu /data
+
+#    - name: "Start kafka server"
+#      command: sudo service kafka start

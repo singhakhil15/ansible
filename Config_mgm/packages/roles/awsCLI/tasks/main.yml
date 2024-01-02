@@ -1,0 +1,27 @@
+---
+# tasks file for awsCLI
+
+#sudo apt-get install python2.7 -y    
+- name: Install python2.7
+  apt:
+    name: "{{ pythonPkg }}"
+
+#curl -O https://bootstrap.pypa.io/get-pip.py
+- name: Download bootstrap.pypa.io/get-pip.py
+  become: true
+  become_user: root 
+  get_url:
+    url: "{{ pipDownloadUrl }}"
+    dest: "{{ pipDownloadDest }}"
+    
+#sudo python2.7 get-pip.py    
+- name: Install pip
+  become: true
+  become_user: root
+  command: "{{ pythonPkg }} {{ pipPkg }}"
+
+#sudo pip install awscli
+- name: Install pip
+  become: true
+  become_user: root
+  command: pip install awscli

@@ -1,0 +1,13 @@
+---
+# vars file for singleEC2
+
+keyName: Kafka-Zookeeper
+awsRegion: us-east-2
+instanceType: t2.small
+imageId: ami-05c1fa8df71875112
+instanceCount: 1
+tagName: "{{ instanceName }}" 
+tagGroup: Worker
+vpcSubnetId: subnet-cf200b85
+securityGroupName: Kafka-Zookeeper
+securityGroupId: sg-00c8a99796b76dbb7

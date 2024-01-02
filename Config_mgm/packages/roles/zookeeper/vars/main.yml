@@ -1,0 +1,4 @@
+---
+# vars file for zookeeper
+
+zookeeper_Url: http://mirrors.estointernet.in/apache/kafka/2.3.0/kafka_2.11-2.3.0.tgz

@@ -1,0 +1,7 @@
+---
+# vars file for awsCLI
+
+pythonPkg: python2.7
+pipDownloadUrl:  https://bootstrap.pypa.io/get-pip.py
+pipDownloadDest: /home/ubuntu/
+pipPkg: get-pip.py

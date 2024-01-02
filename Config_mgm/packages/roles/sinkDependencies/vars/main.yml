@@ -1,0 +1,17 @@
+---
+# vars file for sinkDependencies
+# vars file for dependencies
+packages:
+  - wget 
+  - ca-certificates 
+  - zip 
+  - net-tools 
+  - vim 
+  - nano 
+  - tar 
+  - netcat
+  - openjdk-8-jdk
+  
+kafkaZookeeperFile: http://mirrors.estointernet.in/apache/kafka/2.3.0/kafka_2.11-2.3.0.tgz
+
+        
